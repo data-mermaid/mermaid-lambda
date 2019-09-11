@@ -8,11 +8,11 @@ install_dependencies: &install_dependencies
   run:
     name: Install Dependencies
     command: |
-      apt-get update
-      apt-get install python-pip
-      pip install pyyaml
-      npm install -g serverless
-      npm install
+      sudo apt-get update
+      sudo apt-get install python-pip
+      sudo pip install pyyaml
+      sudo npm install -g serverless
+      sudo npm install
 deploy: &deploy
   run:
     name: Deploy
