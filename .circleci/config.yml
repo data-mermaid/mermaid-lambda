@@ -1,0 +1,58 @@
+version: 2
+
+defaults: &defaults
+  docker:
+    - image: circleci/node:stretch
+
+install_dependencies: &install_dependencies
+  run:
+    name: Install Dependencies
+    command: |
+      pip install pyyaml
+      npm install -g serverless
+      npm install
+deploy: &deploy
+  run:
+    name: Deploy
+    command: cd src && serverless deploy
+
+jobs:
+
+  deploy_dev:
+    <<: *defaults
+    steps:
+      - checkout
+      - setup_remote_docker
+      - *install_dependencies
+      - run:
+          name: Build
+          command: export ENV=dev && python setenv
+      - *deploy
+
+  deploy_prod:
+    <<: *defaults
+    steps:
+      - checkout
+      - setup_remote_docker
+      - *install_dependencies
+      - run:
+          name: Build
+          command: export ENV=prod && python setenv
+      - *deploy
+
+workflows:
+  version: 2
+  build_test_deploy:
+    jobs:
+      - deploy_dev:
+          context: org-global
+          filters:
+            branches:
+              only: develop
+      - deploy_prod:
+          context: org-global
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /v[0-9]+(\.[0-9]+)+/
