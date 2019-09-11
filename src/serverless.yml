@@ -1,0 +1,15 @@
+service: mermaid-lambda
+
+provider:
+  name: aws
+  runtime: python3.6
+  region: us-east-1
+
+functions:
+  mermaidLogger:
+    handler: handler.mermaidLogger
+    events:
+      - http:
+          path: /log
+          method: post
+          cors: true

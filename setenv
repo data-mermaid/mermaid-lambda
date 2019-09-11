@@ -1,0 +1,26 @@
+#!/usr/bin/env python
+
+import os
+import re
+from yaml import load, dump
+
+
+with file('src/serverless.yml', 'r') as input_file:
+    content = load(input_file)
+
+env = os.environ.get('ENV') or 'dev'
+
+env_vars = []
+for key, val in os.environ.items():
+    if key.startswith('MERMAID_'):
+        env_vars.append([key, val])
+
+content['provider']['stage'] = env
+for func_name, val in content['functions'].items():
+    content['functions'][func_name]['environment'] = {}
+
+    for e, v in env_vars:
+        content['functions'][func_name]['environment'][e] = v
+
+with file('src/serverless.yml', 'w') as output:
+    dump(content, output, default_flow_style=False)
